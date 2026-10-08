@@ -9,10 +9,31 @@ Release builds. The emulator ran in-process and streamed over localhost TCP (rea
 This measures the acquisition/processing pipeline only — WPF rendering is **not** included (it cannot run on
 Linux); on Windows the UI tick drains the same buffers.
 
+## Windows developer PC (2026-10-07)
+
+**Environment:** Windows 10.0.26300 (Windows 11), x64, **16 logical CPUs**, .NET 10.0.12, workstation GC,
+MSVC native library, Release builds. Emulator in-process over localhost TCP; queue 256 batches, rolling window 20,
+emulator batch interval 50 ms, no recording, a UI-like drain every 100 ms.
+
+| Workload | Duration | Received = processed | Dropped | Gaps | Latency p50 / p99 / max | Managed heap start → end (2nd-half slope) | Working set start → end | GC 0/1/2 |
+|---|---:|---:|---:|---:|---|---|---|---|
+| **4 ch × 10 Hz** (plan baseline) | 300 s | 12,004 | 0 | 0 | 0.028 / 0.062 / 5.30 ms | 9.0 → 17.3 MiB (+4.3 KiB/s) | 38.6 → 52.4 MiB | 3/3/2 |
+| 16 ch × 1 000 Hz (stress) | 60 s | 959,424 | 0 | 0 | 0.463 / 0.939 / 11.3 ms | 10.9 → 28.3 MiB (−104 KiB/s) | 39.8 → 73.2 MiB | 68/25/24 |
+
+- **No sample loss** in either workload: every received sample was processed, nothing was dropped, and per-channel
+  sequence numbers had no gaps.
+- **Stress throughput** was 15,975 samples/s against a nominal 16,000. The difference (≈0.2 %) is emulator pacing
+  (soft timing with `Task.Delay`) plus start-up inside the 60.1 s window — not loss: dropped = 0 and gaps = 0.
+- **Max latency** values are one-off start-up/JIT and GC pauses; p99 is the representative figure.
+- **Memory:** the heap slope over the second half is near zero or negative, i.e. no sustained growth. A 60 s run at
+  10 Hz is too short to judge memory (only one GC occurs); use the 300 s run.
+
+## Earlier Linux measurements
+
 ## Sustained runs
 
 ```
-dotnet Benchmarks/bin/Release/net8.0/TempLab.Benchmarks.dll sustained --channels C --rate R --seconds S
+dotnet Benchmarks/bin/Release/net10.0/TempLab.Benchmarks.dll sustained --channels C --rate R --seconds S
 ```
 
 | Workload | Duration | Processed | Dropped | Gaps | Latency p50 / p99 / max | Managed heap start → end | Working set start → end |
@@ -41,7 +62,7 @@ drops the newest batches and counts them; after stop `Received = Processed + Dro
 
 ```
 NativeProcessing/build/bin/bench_rolling_stats                  # C++ only, tl_push_batch, 4 channels
-dotnet Benchmarks/bin/Release/net8.0/TempLab.Benchmarks.dll processors   # through P/Invoke from C#
+dotnet Benchmarks/bin/Release/net10.0/TempLab.Benchmarks.dll processors   # through P/Invoke from C#
 ```
 
 | Path | Window | Throughput |
@@ -62,7 +83,7 @@ correctness, not as a performance comparison against optimised C#.
 ```
 cmake -S NativeProcessing -B NativeProcessing/build -DCMAKE_BUILD_TYPE=Release && cmake --build NativeProcessing/build -j
 dotnet build Benchmarks -c Release
-dotnet Benchmarks/bin/Release/net8.0/TempLab.Benchmarks.dll sustained --channels 4 --rate 10 --seconds 300
+dotnet Benchmarks/bin/Release/net10.0/TempLab.Benchmarks.dll sustained --channels 4 --rate 10 --seconds 300
 ```
 
 Record machine, workload and configuration alongside any number you quote.

@@ -79,20 +79,20 @@ dotnet run --project DesktopApp/Wpf
    engine and produces identical statistics.
 6. Explain the boundary and threads: `Docs/architecture.md` (C ABI rules, thread-ownership table, overflow policy).
 
-## Verified results (2026-10-07)
+## Verified results (2026-10-07, Windows 11 developer PC)
+
+Machine: Windows 10.0.26300 (Windows 11), x64, 16 logical CPUs, .NET 10.0.12, MSVC (Visual Studio Build Tools 2026), Release builds.
 
 | Check | Result |
 |---|---|
-| Native tests (`ctest`, also under ASan + UBSan) | 9 tests, 118 checks, all pass |
-| Managed tests (Linux, offline xUnit stand-in) | 86 tests, all pass; 16 consecutive runs (4 concurrent at a time) all green |
-| Sustained 4 ch × 10 Hz × 300 s | 12,004 samples, 0 dropped, 0 gaps, p99 latency 0.11 ms, no heap growth |
-| Stress 16 ch × 1 kHz × 60 s | 959,696 samples, 0 dropped, 0 gaps, p99 latency 0.76 ms |
+| Native tests (MSVC; also GCC/Clang and ASan + UBSan in CI) | 9 tests, 118 checks, all pass |
+| Managed tests (xUnit) | 86 tests, all pass |
+| WPF desktop app | Builds and runs; live acquisition, alert, record, replay and connection-loss recovery demonstrated end to end |
+| Replay reproducibility | Live session and its replay: same 856 samples, same alert (Ch 3, 37.06 °C), same final statistics |
+| Sustained 4 ch × 10 Hz × 300 s | 12,004 samples, 0 dropped, 0 gaps, latency p50 / p99 0.028 / 0.062 ms, heap flat (≈17 MiB) |
+| Stress 16 ch × 1 kHz × 60 s | 959,424 samples, 0 dropped, 0 gaps, latency p50 / p99 0.46 / 0.94 ms |
 
-Details and environment: `Docs/performance.md`.
-
-**Not verified in this environment:** the WPF project and MSVC build were written for Windows and are built,
-tested and published by the `windows` CI job; they could not be compiled in the Linux workspace this was
-developed in (no Windows Desktop SDK). Run CI (or build on Windows) before quoting WPF-specific claims.
+Details, method and caveats: `Docs/performance.md`.
 
 ## How the plan's requirements map to the code
 
