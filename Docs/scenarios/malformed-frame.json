@@ -1,0 +1,2 @@
+{ "name": "malformed-frame", "seed": 1,
+  "faults": [ { "kind": "MalformedFrame", "afterSequence": 30 } ] }

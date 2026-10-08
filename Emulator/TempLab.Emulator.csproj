@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TempLab.Emulator</RootNamespace>
+    <AssemblyName>TempLab.Emulator</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Protocol/TempLab.Protocol.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="TempLab.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+{
+  "solution": {
+    "path": "TempLab.sln",
+    "projects": [
+      "Protocol\\TempLab.Protocol.csproj",
+      "ClientLibrary\\TempLab.Client.csproj",
+      "Emulator\\TempLab.Emulator.csproj",
+      "ConsoleClient\\TempLab.ConsoleClient.csproj",
+      "Core\\TempLab.Acquisition.csproj",
+      "DesktopApp\\Presentation\\TempLab.Presentation.csproj",
+      "Tests\\TempLab.Tests.csproj",
+      "Benchmarks\\TempLab.Benchmarks.csproj"
+    ]
+  }
+}

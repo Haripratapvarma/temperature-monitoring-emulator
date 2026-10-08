@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Thin WPF shell: XAML views, the trend chart control and Windows adapters.
+       All behaviour lives in TempLab.Presentation (view models) and TempLab.Acquisition. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RootNamespace>TempLab.DesktopApp</RootNamespace>
+    <AssemblyName>TempLab.DesktopApp</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Presentation/TempLab.Presentation.csproj" />
+  </ItemGroup>
+</Project>

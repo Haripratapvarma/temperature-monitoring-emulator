@@ -1,0 +1,2 @@
+{ "name": "sensor-fault", "seed": 1,
+  "faults": [ { "kind": "AcquisitionFault", "afterSequence": 80, "code": "SensorFault" } ] }

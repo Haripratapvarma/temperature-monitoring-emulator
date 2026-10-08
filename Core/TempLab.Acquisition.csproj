@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>TempLab.Acquisition</RootNamespace>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ClientLibrary/TempLab.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="TempLab.Tests" />
+  </ItemGroup>
+  <!-- Ship the CMake-built native library next to every assembly that references this project. -->
+  <ItemGroup>
+    <None Include="$(NativeBinDir)libtemplab_native.so" Condition="Exists('$(NativeBinDir)libtemplab_native.so')" Link="libtemplab_native.so" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NativeBinDir)libtemplab_native.dylib" Condition="Exists('$(NativeBinDir)libtemplab_native.dylib')" Link="libtemplab_native.dylib" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(NativeBinDir)templab_native.dll" Condition="Exists('$(NativeBinDir)templab_native.dll')" Link="templab_native.dll" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

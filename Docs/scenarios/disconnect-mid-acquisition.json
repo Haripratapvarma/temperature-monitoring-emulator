@@ -1,0 +1,2 @@
+{ "name": "disconnect-mid-acquisition", "seed": 1,
+  "faults": [ { "kind": "Disconnect", "afterSequence": 50 } ] }

@@ -1,0 +1,2 @@
+{ "name": "delayed-status-reply", "seed": 1,
+  "faults": [ { "kind": "DelayReply", "command": "status", "delayMs": 3000, "count": 1 } ] }

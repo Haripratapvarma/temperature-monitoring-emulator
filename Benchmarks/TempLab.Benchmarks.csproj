@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TempLab.Benchmarks</RootNamespace>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Core/TempLab.Acquisition.csproj" />
+    <ProjectReference Include="../Emulator/TempLab.Emulator.csproj" />
+  </ItemGroup>
+</Project>

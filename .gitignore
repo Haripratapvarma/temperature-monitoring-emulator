@@ -1,0 +1,8 @@
+bin/
+obj/
+NativeProcessing/build*/
+TestResults/
+publish/
+*.user
+.vs/
+*.log

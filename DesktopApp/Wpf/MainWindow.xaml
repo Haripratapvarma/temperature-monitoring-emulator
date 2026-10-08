@@ -1,0 +1,177 @@
+<Window x:Class="TempLab.DesktopApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:TempLab.DesktopApp.Controls"
+        Title="TempLab — Temperature Monitor"
+        Width="1280" Height="820" MinWidth="980" MinHeight="620"
+        Background="{StaticResource PanelBrush}">
+    <DockPanel Margin="10">
+
+        <!-- Status bar -->
+        <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="0,1,0,0" Padding="0,6,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource Counter}" Text="{Binding Counters.Received, StringFormat='received {0}'}" />
+                    <TextBlock Style="{StaticResource Counter}" Text="{Binding Counters.Processed, StringFormat='processed {0}'}" />
+                    <TextBlock Style="{StaticResource Counter}" Text="{Binding Counters.Dropped, StringFormat='dropped {0}'}" />
+                    <TextBlock Style="{StaticResource Counter}" Text="{Binding Counters.GapSamples, StringFormat='gaps {0}'}" />
+                    <TextBlock Style="{StaticResource Counter}" Text="{Binding Counters.Invalid, StringFormat='invalid {0}'}" />
+                    <TextBlock Style="{StaticResource Counter}" Text="{Binding Counters.QueueDepth, StringFormat='queue {0}'}" />
+                    <TextBlock Style="{StaticResource Counter}" Text="{Binding Counters.MaxLatencyMs, StringFormat='max latency {0:F2} ms'}" />
+                </StackPanel>
+                <TextBlock Text="{Binding StatusMessage}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+
+        <!-- Left: connection, acquisition settings, channels -->
+        <ScrollViewer DockPanel.Dock="Left" Width="300" VerticalScrollBarVisibility="Auto" Margin="0,0,10,0">
+            <StackPanel>
+                <GroupBox Header="Source">
+                    <StackPanel>
+                        <ComboBox ItemsSource="{Binding SourceModes}" SelectedItem="{Binding Mode}" IsEnabled="{Binding CanEditSettings}" />
+
+                        <TextBlock Style="{StaticResource Label}" Text="Emulator host / port" />
+                        <Grid IsEnabled="{Binding CanEditSettings}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="70" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding Host, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,6,6" />
+                            <TextBox Grid.Column="1" Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                        <WrapPanel>
+                            <Button Content="Connect" Command="{Binding ConnectCommand}" />
+                            <Button Content="Disconnect" Command="{Binding DisconnectCommand}" />
+                            <Button Content="Reset device" Command="{Binding ResetDeviceCommand}" />
+                        </WrapPanel>
+                        <TextBlock>
+                            <Run Text="Connection: " Foreground="#5A6270" /><Run Text="{Binding ConnectionStatus, Mode=OneWay}" FontWeight="SemiBold" />
+                            <Run Text="   Device: " Foreground="#5A6270" /><Run Text="{Binding DeviceState, Mode=OneWay}" FontWeight="SemiBold" />
+                        </TextBlock>
+
+                        <TextBlock Style="{StaticResource Label}" Text="Replay file" Margin="0,10,0,2" />
+                        <DockPanel IsEnabled="{Binding CanEditSettings}">
+                            <Button DockPanel.Dock="Right" Content="…" MinWidth="30" Command="{Binding BrowseReplayCommand}" Margin="6,0,0,6" />
+                            <TextBox Text="{Binding ReplayPath, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                        <TextBlock Style="{StaticResource Label}" Text="Replay speed (0 = as fast as possible)" />
+                        <TextBox Text="{Binding ReplaySpeed, UpdateSourceTrigger=LostFocus}" IsEnabled="{Binding CanEditSettings}" />
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Acquisition (editable while idle)">
+                    <StackPanel IsEnabled="{Binding CanEditSettings}">
+                        <TextBlock Style="{StaticResource Label}" Text="Rate (samples/s per channel)" />
+                        <TextBox Text="{Binding RateHz, UpdateSourceTrigger=LostFocus}" />
+                        <TextBlock Style="{StaticResource Label}" Text="Signal seed" />
+                        <TextBox Text="{Binding Seed, UpdateSourceTrigger=LostFocus}" />
+                        <TextBlock Style="{StaticResource Label}" Text="Rolling window (samples)" />
+                        <TextBox Text="{Binding WindowSize, UpdateSourceTrigger=LostFocus}" />
+                        <TextBlock Style="{StaticResource Label}" Text="Alert on" />
+                        <ComboBox ItemsSource="{Binding AlertSources}" SelectedItem="{Binding AlertSource}" />
+                        <CheckBox Content="Record session to CSV" IsChecked="{Binding RecordEnabled}" />
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="…" MinWidth="30" Command="{Binding BrowseRecordingCommand}" Margin="6,0,0,6" />
+                            <TextBox Text="{Binding RecordingPath, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Channels and thresholds (°C)">
+                    <ItemsControl ItemsSource="{Binding Channels}" IsEnabled="{Binding CanEditSettings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="1" Margin="0,0,6,0" ToolTip="Low threshold"
+                                             Text="{Binding Low, UpdateSourceTrigger=LostFocus, TargetNullValue=''}" />
+                                    <TextBox Grid.Column="2" ToolTip="High threshold"
+                                             Text="{Binding High, UpdateSourceTrigger=LostFocus, TargetNullValue=''}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </GroupBox>
+
+                <WrapPanel>
+                    <Button Content="Start" Command="{Binding StartCommand}" FontWeight="SemiBold" />
+                    <Button Content="Stop" Command="{Binding StopCommand}" />
+                    <Button Content="Export processed…" Command="{Binding ExportCommand}" />
+                </WrapPanel>
+                <TextBlock Text="{Binding EngineStateText, StringFormat='Engine: {0}'}" Foreground="#5A6270" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Right: alerts + event log -->
+        <Grid DockPanel.Dock="Right" Width="330" Margin="10,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <GroupBox Header="Alerts (newest first)">
+                <ListView ItemsSource="{Binding Alerts}" BorderThickness="0">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Time" Width="86" DisplayMemberBinding="{Binding Time}" />
+                            <GridViewColumn Header="Ch" Width="44" DisplayMemberBinding="{Binding Channel}" />
+                            <GridViewColumn Header="Kind" Width="44" DisplayMemberBinding="{Binding Kind}" />
+                            <GridViewColumn Header="Value" Width="56" DisplayMemberBinding="{Binding Value}" />
+                            <GridViewColumn Header="Limit" Width="56" DisplayMemberBinding="{Binding Threshold}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Events">
+                <ListBox ItemsSource="{Binding EventLog}" BorderThickness="0" FontFamily="Consolas" FontSize="11" />
+            </GroupBox>
+        </Grid>
+
+        <!-- Centre: live values + chart -->
+        <DockPanel>
+            <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding Channels}" Margin="0,0,0,8">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="1" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="White" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1"
+                                CornerRadius="4" Padding="8" Margin="0,0,8,0"
+                                Visibility="{Binding IsSelected, Converter={StaticResource BoolToVis}}">
+                            <StackPanel>
+                                <DockPanel>
+                                    <TextBlock Text="●" Foreground="{StaticResource AlertBrush}" DockPanel.Dock="Right"
+                                               Visibility="{Binding IsAlerting, Converter={StaticResource BoolToVis}}" ToolTip="Beyond threshold" />
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                </DockPanel>
+                                <TextBlock FontSize="22" FontFamily="Consolas">
+                                    <Run Text="{Binding RawText, Mode=OneWay}" /><Run Text=" °C" FontSize="12" />
+                                </TextBlock>
+                                <TextBlock FontFamily="Consolas" FontSize="11" Foreground="#5A6270">
+                                    <Run Text="mean " /><Run Text="{Binding MeanText, Mode=OneWay}" />
+                                    <Run Text=" min " /><Run Text="{Binding MinText, Mode=OneWay}" />
+                                    <Run Text=" max " /><Run Text="{Binding MaxText, Mode=OneWay}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,4">
+                <CheckBox x:Name="ShowRawBox" Content="Raw" IsChecked="True" Margin="0,0,12,0" />
+                <CheckBox x:Name="ShowMeanBox" Content="Rolling mean" IsChecked="True" />
+            </StackPanel>
+            <Border BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1">
+                <controls:TrendChart x:Name="Chart" Channels="{Binding Channels}"
+                                     ShowRaw="{Binding IsChecked, ElementName=ShowRawBox}"
+                                     ShowMean="{Binding IsChecked, ElementName=ShowMeanBox}" />
+            </Border>
+        </DockPanel>
+    </DockPanel>
+</Window>

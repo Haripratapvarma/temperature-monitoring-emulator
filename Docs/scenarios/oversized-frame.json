@@ -1,0 +1,2 @@
+{ "name": "oversized-frame", "seed": 1,
+  "faults": [ { "kind": "OversizedFrame", "afterSequence": 30 } ] }

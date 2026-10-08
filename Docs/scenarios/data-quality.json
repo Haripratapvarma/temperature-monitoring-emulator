@@ -1,0 +1,5 @@
+{ "name": "data-quality", "seed": 1,
+  "faults": [
+    { "kind": "InvalidReadings", "channel": 1, "afterSequence": 40, "count": 10 },
+    { "kind": "SkipSequences", "afterSequence": 120, "count": 5 }
+  ] }

@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>TempLab.Tests</RootNamespace>
+    <AssemblyName>TempLab.Tests</AssemblyName>
+    <!-- xUnit analyzer suggestions stay visible as warnings but do not fail the build. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Default: real xUnit (CI, any machine with nuget.org). -->
+  <ItemGroup Condition="'$(UseXunitShim)' != 'true'">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UseXunitShim)' != 'true'">
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <!-- Offline: same sources compiled against tools/XunitShim and run as an exe. -->
+  <PropertyGroup Condition="'$(UseXunitShim)' == 'true'">
+    <OutputType>Exe</OutputType>
+    <IsTestProject>false</IsTestProject>
+    <DefineConstants>$(DefineConstants);XUNIT_SHIM</DefineConstants>
+    <StartupObject>XunitShim.Runner</StartupObject>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UseXunitShim)' == 'true'">
+    <Compile Include="../tools/XunitShim/XunitShim.cs" Link="XunitShim.cs" />
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Protocol/TempLab.Protocol.csproj" />
+    <ProjectReference Include="../ClientLibrary/TempLab.Client.csproj" />
+    <ProjectReference Include="../Emulator/TempLab.Emulator.csproj" />
+    <ProjectReference Include="../Core/TempLab.Acquisition.csproj" />
+    <ProjectReference Include="../DesktopApp/Presentation/TempLab.Presentation.csproj" />
+  </ItemGroup>
+</Project>

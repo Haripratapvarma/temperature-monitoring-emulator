@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- View models and UI-independent presentation logic. Plain net10.0 so it builds and is unit-tested
+       on any OS; the WPF project (TempLab.DesktopApp) only adds XAML views and platform adapters. -->
+  <PropertyGroup>
+    <RootNamespace>TempLab.Presentation</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Core/TempLab.Acquisition.csproj" />
+  </ItemGroup>
+</Project>

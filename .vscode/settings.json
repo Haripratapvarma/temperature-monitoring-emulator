@@ -1,0 +1,4 @@
+{
+    "cmake.sourceDirectory": "${workspaceFolder}/NativeProcessing",
+    "cmake.buildDirectory": "${workspaceFolder}/NativeProcessing/build"
+}
